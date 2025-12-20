@@ -1,0 +1,3 @@
+h1 -> titulo (no se puede puede usar para mas de una cosa)
+h2 -> hero title
+h3 -> subtitulo (sirve para texto en nav (li), footer o formularios (label)
