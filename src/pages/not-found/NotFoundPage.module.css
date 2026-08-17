@@ -1,0 +1,32 @@
+.page {
+  display: grid;
+  width: min(calc(100% - 2rem), var(--page-width));
+  min-height: 65vh;
+  align-content: center;
+  justify-items: start;
+  margin: 0 auto;
+}
+
+.page p,
+.page h1 {
+  margin: 0;
+}
+
+.page p {
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+}
+
+.page h1 {
+  max-width: 800px;
+  margin-top: 1rem;
+  font-size: clamp(2.5rem, 7vw, 6rem);
+  letter-spacing: -0.07em;
+  line-height: 0.95;
+}
+
+.page a {
+  margin-top: 2rem;
+  font-weight: 700;
+}
+

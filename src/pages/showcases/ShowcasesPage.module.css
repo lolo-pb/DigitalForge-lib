@@ -1,0 +1,139 @@
+.page {
+  width: min(calc(100% - 2rem), var(--page-width));
+  margin: 0 auto;
+  padding: 5rem 0 7rem;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.55fr);
+  padding-bottom: 3rem;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.header p,
+.header h1,
+.header span {
+  margin: 0;
+}
+
+.header p {
+  grid-column: 1 / -1;
+  margin-bottom: 0.8rem;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.header h1 {
+  font-size: clamp(3.5rem, 10vw, 8rem);
+  letter-spacing: -0.08em;
+  line-height: 0.9;
+}
+
+.header span {
+  align-self: end;
+  color: var(--color-muted);
+  line-height: 1.65;
+}
+
+.grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: minmax(18rem, 0.8fr) 1.2fr;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-large);
+  background: var(--color-surface);
+  text-decoration: none;
+}
+
+.preview {
+  position: relative;
+  display: flex;
+  min-height: 22rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  overflow: hidden;
+  padding: 1.2rem;
+  color: white;
+  background:
+    linear-gradient(140deg, transparent 25%, rgb(255 255 255 / 9%) 25% 45%, transparent 45%),
+    #1c1a19;
+}
+
+.previewShape {
+  position: absolute;
+  right: -15%;
+  bottom: -35%;
+  width: 82%;
+  aspect-ratio: 1;
+  border-radius: 48% 52% 38% 62%;
+  background: linear-gradient(135deg, #ffb29f, #ff5c35 55%, #7d1d05);
+  box-shadow: 0 0 90px rgb(255 92 53 / 45%);
+}
+
+.cardCopy {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-direction: column;
+  padding: clamp(2rem, 6vw, 5rem);
+}
+
+.cardCopy h2,
+.cardCopy p,
+.cardCopy ul {
+  margin: 0;
+}
+
+.cardCopy h2 {
+  font-size: clamp(2rem, 5vw, 4.5rem);
+  letter-spacing: -0.065em;
+}
+
+.cardCopy p {
+  max-width: 42rem;
+  margin-top: 1rem;
+  color: var(--color-muted);
+  line-height: 1.65;
+}
+
+.cardCopy ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  padding: 0;
+  margin-top: 1.5rem;
+  list-style: none;
+}
+
+.cardCopy li {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  color: var(--color-muted);
+  font-size: 0.75rem;
+}
+
+@media (max-width: 760px) {
+  .header,
+  .card {
+    grid-template-columns: 1fr;
+  }
+
+  .header span {
+    margin-top: 1.5rem;
+  }
+
+  .preview {
+    min-height: 17rem;
+  }
+}
+
