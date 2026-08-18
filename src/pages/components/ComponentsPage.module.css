@@ -1,0 +1,111 @@
+.page {
+  width: min(calc(100% - 2rem), var(--page-width));
+  margin: 0 auto;
+  padding: 5rem 0 7rem;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.55fr);
+  padding-bottom: 3rem;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.header p,
+.header h1,
+.header span {
+  margin: 0;
+}
+
+.header p {
+  grid-column: 1 / -1;
+  margin-bottom: 0.8rem;
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.header h1 {
+  font-size: clamp(3.5rem, 10vw, 8rem);
+  letter-spacing: -0.08em;
+  line-height: 0.9;
+}
+
+.header span {
+  align-self: end;
+  color: var(--color-muted);
+  line-height: 1.65;
+}
+
+.section {
+  display: grid;
+  grid-template-columns: minmax(11rem, 0.3fr) minmax(0, 1fr);
+  gap: 2rem;
+  padding: 3rem 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.sectionLabel {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.sectionLabel span {
+  font-size: 1.15rem;
+  font-weight: 750;
+}
+
+.sectionLabel code {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+.previewCard {
+  overflow: hidden;
+  min-width: 0;
+  padding: 1.5rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-medium);
+  background:
+    linear-gradient(90deg, rgb(23 23 19 / 3%) 1px, transparent 1px),
+    linear-gradient(rgb(23 23 19 / 3%) 1px, transparent 1px),
+    var(--color-surface);
+  background-size: 24px 24px;
+}
+
+.previewCard > header,
+.previewCard > footer {
+  width: 100%;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-small);
+  background: var(--color-canvas);
+}
+
+.previewCard > footer {
+  padding-right: 1rem;
+  padding-left: 1rem;
+}
+
+.inlinePreview {
+  display: flex;
+  min-height: 10rem;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+@media (max-width: 760px) {
+  .header,
+  .section {
+    grid-template-columns: 1fr;
+  }
+
+  .header span {
+    margin-top: 1.5rem;
+  }
+}
+

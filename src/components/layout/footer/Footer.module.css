@@ -1,0 +1,23 @@
+.footer {
+  display: flex;
+  width: min(calc(100% - 2rem), var(--page-width));
+  justify-content: space-between;
+  gap: 2rem;
+  margin: 0 auto;
+  padding: 2rem 0 2.5rem;
+  border-top: 1px solid var(--color-line);
+  color: var(--color-muted);
+  font-size: 0.85rem;
+}
+
+.footer p {
+  margin: 0;
+}
+
+@media (max-width: 560px) {
+  .footer {
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+}
+
