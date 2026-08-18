@@ -12,6 +12,14 @@ const StudioLanding = lazy(
   () => import("../showcases/studio-landing/StudioLanding"),
 );
 
+const AthletesUsa = lazy(
+  () => import("../showcases/athletes-usa/AthletesUsa"),
+);
+
+const AthletesDetail = lazy(
+  () => import("../showcases/athletes-usa/AthletesDetail"),
+);
+
 export function App() {
   return (
     <Suspense
@@ -30,6 +38,11 @@ export function App() {
         </Route>
 
         <Route path="showcases/studio-landing" element={<StudioLanding />} />
+        <Route path="showcases/athletes-usa" element={<AthletesUsa />} />
+        <Route
+          path="showcases/athletes-usa/:detail"
+          element={<AthletesDetail />}
+        />
       </Routes>
     </Suspense>
   );

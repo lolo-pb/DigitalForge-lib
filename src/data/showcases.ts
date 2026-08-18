@@ -7,6 +7,13 @@ export type Showcase = {
 
 export const showcases: Showcase[] = [
   {
+    title: "Athletes USA",
+    description:
+      "A mobile-first, scroll-led offer journey that turns an athletic scholarship presentation into a cinematic web experience.",
+    route: "/showcases/athletes-usa",
+    tags: ["Landing page", "Scroll animation", "Mobile-first"],
+  },
+  {
     title: "Studio Landing",
     description:
       "A self-contained editorial landing page used to prove that showcases can ignore the hub layout.",
