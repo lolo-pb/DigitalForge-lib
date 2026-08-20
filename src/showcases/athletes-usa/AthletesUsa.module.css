@@ -615,6 +615,26 @@
   object-fit: cover;
 }
 
+.proofLogo {
+  position: absolute;
+  z-index: 2;
+  top: 0.45rem;
+  right: 0.45rem;
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0.25rem;
+  border: 1px solid rgb(6 27 79 / 12%);
+  background: white;
+  box-shadow: 0 0.5rem 1rem rgb(2 10 34 / 20%);
+  place-items: center;
+  will-change: opacity, transform;
+}
+
+.proofStrip .proofLogo img {
+  object-fit: contain;
+}
+
 .proofStrip figcaption {
   position: absolute;
   right: 0;

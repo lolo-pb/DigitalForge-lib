@@ -16,9 +16,12 @@ import {
 } from "animejs";
 import { Link, useLocation } from "react-router-dom";
 import campusImage from "./assets/campus-source.jpg";
-import proofNine from "./assets/proof-09.jpg";
-import proofTen from "./assets/proof-10.jpg";
-import proofEleven from "./assets/proof-11.jpg";
+import delfiGonzalezCase from "./assets/case-delfi-gonzalez.jpg";
+import delfinaSchmidtCase from "./assets/case-delfina-schmidt.jpg";
+import emilJaaskelainenCase from "./assets/case-emil-jaaskelainen.jpg";
+import liuSharksLogo from "./assets/logo-liu-sharks.png";
+import rioGrandeLogo from "./assets/logo-rio-grande.png";
+import stLouisCityLogo from "./assets/logo-st-louis-city.png";
 import stadiumImage from "./assets/stadium-source.jpg";
 import styles from "./AthletesUsa.module.css";
 
@@ -197,16 +200,25 @@ function SupportProof() {
   return (
     <div className={styles.proofStrip}>
       <figure data-proof-card>
-        <img src={proofNine} alt="Equipo de Athletes USA Argentina" loading="lazy" />
-        <figcaption>Experiencia de ambos lados</figcaption>
+        <img src={emilJaaskelainenCase} alt="Emil Jaaskelainen con la camiseta de St. Louis City" loading="lazy" />
+        <span className={styles.proofLogo} data-proof-logo aria-hidden="true">
+          <img src={stLouisCityLogo} alt="" loading="lazy" />
+        </span>
+        <figcaption>Emil Jaaskelainen</figcaption>
       </figure>
       <figure data-proof-card>
-        <img src={proofTen} alt="Casos de éxito de Athletes USA" loading="lazy" />
-        <figcaption>Historias que llegaron más lejos</figcaption>
+        <img src={delfinaSchmidtCase} alt="Delfina Schmidt con la camiseta de Boca Juniors" loading="lazy" />
+        <span className={styles.proofLogo} data-proof-logo aria-hidden="true">
+          <img src={rioGrandeLogo} alt="" loading="lazy" />
+        </span>
+        <figcaption>Delfina Schmidt</figcaption>
       </figure>
       <figure data-proof-card>
-        <img src={proofEleven} alt="Estudiantes-atletas de Athletes USA" loading="lazy" />
-        <figcaption>Atletas de distintos deportes</figcaption>
+        <img src={delfiGonzalezCase} alt="Delfi González con su palo de hockey" loading="lazy" />
+        <span className={styles.proofLogo} data-proof-logo aria-hidden="true">
+          <img src={liuSharksLogo} alt="" loading="lazy" />
+        </span>
+        <figcaption>Delfi González</figcaption>
       </figure>
     </div>
   );
@@ -457,6 +469,9 @@ export default function AthletesUsa() {
       const proofCards = Array.from(
         root.querySelectorAll<HTMLElement>("[data-proof-card]"),
       );
+      const proofLogos = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-proof-logo]"),
+      );
 
       const setActiveScene = (progress: number) => {
         const activeIndex = [0.16, 0.36, 0.56, 0.76, 0.94]
@@ -525,6 +540,7 @@ export default function AthletesUsa() {
         utils.set(offerCard, { rotate: -4, y: "2rem" });
         utils.set(offerTags, { opacity: 0, y: "0.8rem" });
         utils.set(proofCards, { opacity: 0.42, scale: 0.96, y: "2rem" });
+        utils.set(proofLogos, { opacity: 0, scale: 0.78, x: "0.8rem" });
       }
 
       setActiveScene(0);
@@ -718,7 +734,15 @@ export default function AthletesUsa() {
             opacity: 1,
             scale: 1,
             y: "0rem",
-          }, 804);
+          }, 804)
+          .add(proofLogos, {
+            delay: stagger(24),
+            duration: 42,
+            ease: "inOut(3)",
+            opacity: 1,
+            scale: 1,
+            x: "0rem",
+          }, 840);
       }
 
       if (handoff) {
