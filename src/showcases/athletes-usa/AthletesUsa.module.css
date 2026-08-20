@@ -529,7 +529,7 @@
 
 .scene[data-side="right"] .journeyArt {
   right: auto;
-  left: 0;
+  left: -2.5rem;
 }
 
 .scene[data-side="right"] .campusArt {
@@ -1017,6 +1017,11 @@
     right: 3%;
     width: 44%;
     height: 58%;
+  }
+
+  .scene[data-side="right"] .journeyArt {
+    right: auto;
+    left: 0;
   }
 
   .journeyArt svg {

@@ -475,9 +475,7 @@ export default function AthletesUsa() {
         utils.set(scene, {
           clipPath: reduceMotion || index === 0
             ? "inset(0% 0% 0% 0%)"
-            : direction === -1
-              ? "inset(0% 100% 0% 0%)"
-              : "inset(0% 0% 0% 100%)",
+            : "inset(100% 0% 0% 0%)",
           opacity: index === 0 ? 1 : 0,
         });
 
@@ -500,7 +498,8 @@ export default function AthletesUsa() {
           if (mediaImages[index]) {
             utils.set(mediaImages[index]!, {
               scale: 1.08,
-              x: `${direction * -2}vw`,
+              x: "0vw",
+              y: "8vh",
             });
           }
         }
@@ -609,7 +608,8 @@ export default function AthletesUsa() {
             duration,
             ease: "inOut(3)",
             scale: 1.08,
-            x: `${fromDirection * -2}vw`,
+            x: "0vw",
+            y: "-4vh",
           }, start);
         }
         if (mediaImages[toIndex]) {
@@ -618,6 +618,7 @@ export default function AthletesUsa() {
             ease: "inOut(3)",
             scale: 1,
             x: "0vw",
+            y: "0vh",
           }, start);
         }
       };
@@ -652,7 +653,8 @@ export default function AthletesUsa() {
             duration: 110,
             ease: "linear",
             scale: 1.04,
-            x: "-1vw",
+            x: "0vw",
+            y: "-2vh",
           }, 0);
 
         if (journeyProgress) {
@@ -706,7 +708,8 @@ export default function AthletesUsa() {
             duration: 108,
             ease: "linear",
             scale: 1.03,
-            x: "-1vw",
+            x: "0vw",
+            y: "-2vh",
           }, 604)
           .add(proofCards, {
             delay: stagger(24),
