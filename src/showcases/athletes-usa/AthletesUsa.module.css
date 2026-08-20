@@ -10,6 +10,20 @@
     "Segoe UI", sans-serif;
 }
 
+.storyTrack {
+  position: relative;
+  height: 600svh;
+  background: var(--ausa-navy-deep);
+}
+
+.storyStage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
 .nav {
   position: fixed;
   z-index: 30;
@@ -83,7 +97,43 @@
   align-items: flex-end;
   overflow: hidden;
   padding: 7rem 1.15rem max(3.25rem, env(safe-area-inset-bottom));
-  scroll-snap-align: start;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  min-height: 0;
+  pointer-events: none;
+  will-change: clip-path, opacity;
+}
+
+.scene[data-active="true"] {
+  pointer-events: auto;
+}
+
+.scene:not([data-scene="dream"]) {
+  opacity: 0;
+}
+
+.scene .sectionContent,
+.scene .artLayer,
+.scene .media img,
+.scene [data-line],
+.scene [data-copy-block] {
+  will-change: opacity, transform;
+}
+
+.handoff {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 88% 12%, rgb(212 7 47 / 24%), transparent 25rem),
+    linear-gradient(145deg, #071d53, #02091d 72%);
+  pointer-events: none;
+  will-change: opacity, transform;
 }
 
 .dark,
@@ -139,6 +189,18 @@
   position: relative;
   z-index: 2;
   width: min(100%, 43rem);
+}
+
+.scene[data-side="right"] .sectionContent {
+  display: flex;
+  margin-left: auto;
+  align-items: flex-end;
+  flex-direction: column;
+  text-align: right;
+}
+
+.scene[data-side="right"] .metrics {
+  width: min(100%, 31rem);
 }
 
 .eyebrow {
@@ -463,6 +525,16 @@
   position: absolute;
   top: 13%;
   right: 1rem;
+}
+
+.scene[data-side="right"] .journeyArt {
+  right: auto;
+  left: 0;
+}
+
+.scene[data-side="right"] .campusArt {
+  right: auto;
+  left: 1rem;
 }
 
 .offerCard {
@@ -901,10 +973,6 @@
 }
 
 @media (min-width: 768px) and (min-height: 640px) {
-  :global(html:has(#athletes-usa)) {
-    scroll-snap-type: y proximity;
-  }
-
   .nav {
     padding-inline: 2rem;
   }
@@ -991,6 +1059,11 @@
   .campusArt {
     top: 18%;
     right: 8%;
+  }
+
+  .scene[data-side="right"] .campusArt {
+    right: auto;
+    left: 8%;
   }
 
   .offerCard {
@@ -1084,10 +1157,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :global(html:has(#athletes-usa)) {
-    scroll-snap-type: none;
-  }
-
   .media img,
   .sectionContent,
   .artLayer > *,

@@ -2,19 +2,19 @@ import {
   FormEvent,
   ReactNode,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react";
-import { Link, useLocation } from "react-router-dom";
 import {
-  domAnimation,
-  LazyMotion,
-  m,
-  MotionConfig,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "motion/react";
+  createScope,
+  createTimeline,
+  onScroll,
+  splitText,
+  stagger,
+  utils,
+} from "animejs";
+import { Link, useLocation } from "react-router-dom";
 import campusImage from "./assets/campus-source.jpg";
 import proofNine from "./assets/proof-09.jpg";
 import proofTen from "./assets/proof-10.jpg";
@@ -22,13 +22,14 @@ import proofEleven from "./assets/proof-11.jpg";
 import stadiumImage from "./assets/stadium-source.jpg";
 import styles from "./AthletesUsa.module.css";
 
-type SectionProps = {
-  art: (progress: ReturnType<typeof useScroll>["scrollYProgress"]) => ReactNode;
+type SceneProps = {
+  art: ReactNode;
   children: ReactNode;
   className?: string;
   id: string;
   image?: string;
   imageAlt?: string;
+  side: "left" | "right";
   theme: "dark" | "light" | "navy";
 };
 
@@ -75,95 +76,75 @@ function Brand() {
 
 function ArrowLink({ children, to }: { children: ReactNode; to: string }) {
   return (
-    <Link className={styles.arrowLink} to={to}>
+    <Link className={styles.arrowLink} data-copy-block to={to}>
       <span>{children}</span>
       <span aria-hidden="true">↗</span>
     </Link>
   );
 }
 
-function Section({
+function Scene({
   art,
   children,
   className = "",
   id,
   image,
   imageAlt = "",
+  side,
   theme,
-}: SectionProps) {
-  const ref = useRef<HTMLElement>(null);
-  const shouldReduceMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const contentY = useTransform(
-    scrollYProgress,
-    [0.05, 0.28, 0.72, 0.95],
-    shouldReduceMotion ? [0, 0, 0, 0] : [36, 0, 0, -20],
-  );
-  const contentOpacity = useTransform(
-    scrollYProgress,
-    [0.05, 0.25, 0.78, 0.98],
-    [0.2, 1, 1, 0.35],
-  );
-  const imageScale = useTransform(
-    scrollYProgress,
-    [0, 1],
-    shouldReduceMotion ? [1, 1] : [1.08, 1],
-  );
-
+}: SceneProps) {
+  const isFirstScene = id === "dream";
   return (
     <section
-      className={`${styles.section} ${styles[theme]} ${className}`}
+      aria-hidden={!isFirstScene}
+      className={`${styles.section} ${styles.scene} ${styles[theme]} ${className}`}
+      data-active={isFirstScene ? "true" : "false"}
+      data-scene={id}
+      data-side={side}
       id={id}
-      ref={ref}
+      inert={!isFirstScene}
     >
       {image ? (
-        <div className={styles.media} aria-hidden={imageAlt === ""}>
-          <m.img src={image} alt={imageAlt} style={{ scale: imageScale }} />
+        <div className={styles.media} data-media aria-hidden={imageAlt === ""}>
+          <img src={image} alt={imageAlt} data-media-image />
           <div className={styles.mediaScrim} />
         </div>
       ) : null}
-      <div className={styles.artLayer}>{art(scrollYProgress)}</div>
-      <m.div
-        className={styles.sectionContent}
-        style={{ opacity: contentOpacity, y: contentY }}
-      >
+      <div className={styles.artLayer} data-art>{art}</div>
+      <div className={styles.sectionContent} data-copy>
         {children}
-      </m.div>
+      </div>
     </section>
   );
 }
 
 function OutcomeOrbit() {
   return (
-    <div className={styles.outcomeOrbit} aria-hidden="true">
-      <span>ESTUDIO</span>
-      <span>DEPORTE</span>
-      <span>FUTURO</span>
-      <div className={styles.orbitCore}>USA</div>
+    <div className={styles.outcomeOrbit} data-orbit aria-hidden="true">
+      <span data-orbit-label>ESTUDIO</span>
+      <span data-orbit-label>DEPORTE</span>
+      <span data-orbit-label>FUTURO</span>
+      <div className={styles.orbitCore} data-orbit-core>USA</div>
     </div>
   );
 }
 
-function JourneyPath({ progress }: { progress: ReturnType<typeof useScroll>["scrollYProgress"] }) {
-  const pathLength = useTransform(progress, [0.08, 0.78], [0, 1]);
+function JourneyPath() {
   const steps = ["Evaluación", "Perfil", "Becas", "Admisión", "Soporte"];
 
   return (
     <div className={styles.journeyArt} aria-hidden="true">
       <svg viewBox="0 0 220 660" preserveAspectRatio="none">
         <path className={styles.journeyTrack} d="M110 20V640" />
-        <m.path
+        <path
           className={styles.journeyProgress}
+          data-journey-progress
           d="M110 20V640"
-          style={{ pathLength }}
         />
       </svg>
       <ol>
         {steps.map((step, index) => (
-          <li key={step}>
+          <li data-journey-item key={step}>
             <span>{String(index + 1).padStart(2, "0")}</span>
             {step}
           </li>
@@ -173,72 +154,61 @@ function JourneyPath({ progress }: { progress: ReturnType<typeof useScroll>["scr
   );
 }
 
-function OpportunityNetwork({ progress }: { progress: ReturnType<typeof useScroll>["scrollYProgress"] }) {
-  const profileScale = useTransform(progress, [0.1, 0.55], [0.82, 1]);
-  const networkOpacity = useTransform(progress, [0.35, 0.7], [0, 1]);
-
+function OpportunityNetwork() {
   return (
     <div className={styles.networkArt} aria-hidden="true">
-      <m.div className={styles.profileCard} style={{ scale: profileScale }}>
+      <div className={styles.profileCard} data-profile-card>
         <div className={styles.profileAvatar}>10</div>
         <div>
           <span>PERFIL DEPORTIVO</span>
           <strong>LISTO PARA COMPETIR</strong>
         </div>
-        <i />
-        <i />
-        <i />
-      </m.div>
-      <m.div className={styles.networkNodes} style={{ opacity: networkOpacity }}>
-        <span>COACH</span>
-        <span>UNIVERSITY</span>
-        <span>TEAM</span>
-        <span>COACH</span>
-      </m.div>
+        <i data-profile-bar />
+        <i data-profile-bar />
+        <i data-profile-bar />
+      </div>
+      <div className={styles.networkNodes} data-network>
+        <span data-network-node>COACH</span>
+        <span data-network-node>UNIVERSITY</span>
+        <span data-network-node>TEAM</span>
+        <span data-network-node>COACH</span>
+      </div>
     </div>
   );
 }
 
-function CampusDocuments({ progress }: { progress: ReturnType<typeof useScroll>["scrollYProgress"] }) {
-  const documentY = useTransform(progress, [0.18, 0.62], [80, 0]);
-  const documentRotate = useTransform(progress, [0.18, 0.62], [-7, 0]);
-
+function CampusDocuments() {
   return (
     <div className={styles.campusArt} aria-hidden="true">
-      <m.div
-        className={styles.offerCard}
-        style={{ rotate: documentRotate, y: documentY }}
-      >
+      <div className={styles.offerCard} data-offer-card>
         <span>UNIVERSITY OFFER</span>
         <strong>ADMITTED</strong>
         <div>
-          <i>BECA</i>
-          <i>VISA</i>
-          <i>CAMPUS</i>
+          <i data-offer-tag>BECA</i>
+          <i data-offer-tag>VISA</i>
+          <i data-offer-tag>CAMPUS</i>
         </div>
-      </m.div>
+      </div>
     </div>
   );
 }
 
-function SupportProof({ progress }: { progress: ReturnType<typeof useScroll>["scrollYProgress"] }) {
-  const proofY = useTransform(progress, [0.2, 0.72], [60, 0]);
-
+function SupportProof() {
   return (
-    <m.div className={styles.proofStrip} style={{ y: proofY }}>
-      <figure>
+    <div className={styles.proofStrip}>
+      <figure data-proof-card>
         <img src={proofNine} alt="Equipo de Athletes USA Argentina" loading="lazy" />
         <figcaption>Experiencia de ambos lados</figcaption>
       </figure>
-      <figure>
+      <figure data-proof-card>
         <img src={proofTen} alt="Casos de éxito de Athletes USA" loading="lazy" />
         <figcaption>Historias que llegaron más lejos</figcaption>
       </figure>
-      <figure>
+      <figure data-proof-card>
         <img src={proofEleven} alt="Estudiantes-atletas de Athletes USA" loading="lazy" />
         <figcaption>Atletas de distintos deportes</figcaption>
       </figure>
-    </m.div>
+    </div>
   );
 }
 
@@ -416,6 +386,386 @@ function EvaluationForm() {
 
 export default function AthletesUsa() {
   const location = useLocation();
+  const rootRef = useRef<HTMLDivElement>(null);
+  const storyRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (location.hash !== "#evaluation") {
+      window.scrollTo({ behavior: "auto", left: 0, top: 0 });
+    }
+  }, []);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    const story = storyRef.current;
+    if (!root || !story) return;
+
+    const scope = createScope({
+      root,
+      mediaQueries: {
+        isDesktop: "(min-width: 768px)",
+        isLandscape: "(orientation: landscape)",
+        reduceMotion: "(prefers-reduced-motion: reduce)",
+      },
+    }).add((self) => {
+      const scenes = Array.from(root.querySelectorAll<HTMLElement>("[data-scene]"));
+      const handoff = root.querySelector<HTMLElement>("[data-handoff]");
+      const reduceMotion = self?.matches.reduceMotion ?? false;
+      const headingLines = scenes.map((scene) => {
+        const heading = scene.querySelector<HTMLElement>("[data-heading]");
+        return heading
+          ? splitText(heading, {
+              accessible: true,
+              lines: { wrap: "clip" },
+            }).lines as HTMLElement[]
+          : [];
+      });
+      const copyBlocks = scenes.map((scene) =>
+        Array.from(scene.querySelectorAll<HTMLElement>("[data-copy-block]")),
+      );
+      const artLayers = scenes.map((scene) =>
+        scene.querySelector<HTMLElement>("[data-art]"),
+      );
+      const mediaImages = scenes.map((scene) =>
+        scene.querySelector<HTMLElement>("[data-media-image]"),
+      );
+      const sceneDirections = scenes.map((scene) =>
+        scene.dataset.side === "right" ? 1 : -1,
+      );
+      const journeyProgress = root.querySelector<SVGPathElement>(
+        "[data-journey-progress]",
+      );
+      const journeyItems = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-journey-item]"),
+      );
+      const orbit = root.querySelector<HTMLElement>("[data-orbit]");
+      const orbitCore = root.querySelector<HTMLElement>("[data-orbit-core]")!;
+      const orbitLabels = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-orbit-label]"),
+      );
+      const profileBars = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-profile-bar]"),
+      );
+      const network = root.querySelector<HTMLElement>("[data-network]")!;
+      const networkNodes = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-network-node]"),
+      );
+      const offerCard = root.querySelector<HTMLElement>("[data-offer-card]")!;
+      const offerTags = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-offer-tag]"),
+      );
+      const proofCards = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-proof-card]"),
+      );
+
+      const setActiveScene = (progress: number) => {
+        const activeIndex = [0.16, 0.36, 0.56, 0.76, 0.94]
+          .findIndex((limit) => progress < limit);
+
+        scenes.forEach((scene, index) => {
+          const isActive = index === activeIndex;
+          scene.dataset.active = String(isActive);
+          scene.inert = !isActive;
+          scene.setAttribute("aria-hidden", String(!isActive));
+        });
+      };
+
+      scenes.forEach((scene, index) => {
+        const direction = sceneDirections[index];
+        utils.set(scene, {
+          clipPath: reduceMotion || index === 0
+            ? "inset(0% 0% 0% 0%)"
+            : direction === -1
+              ? "inset(0% 100% 0% 0%)"
+              : "inset(0% 0% 0% 100%)",
+          opacity: index === 0 ? 1 : 0,
+        });
+
+        if (!reduceMotion && index > 0) {
+          utils.set(headingLines[index], {
+            opacity: 0,
+            x: `${direction * 105}vw`,
+          });
+          utils.set(copyBlocks[index], {
+            opacity: 0,
+            x: `${direction * 105}vw`,
+          });
+          if (artLayers[index]) {
+            utils.set(artLayers[index]!, {
+              opacity: 0,
+              scale: 0.94,
+              x: `${direction * -7}vw`,
+            });
+          }
+          if (mediaImages[index]) {
+            utils.set(mediaImages[index]!, {
+              scale: 1.08,
+              x: `${direction * -2}vw`,
+            });
+          }
+        }
+      });
+
+      if (handoff) {
+        utils.set(handoff, {
+          opacity: 0,
+          y: reduceMotion ? "0%" : "100%",
+        });
+      }
+      if (journeyProgress && !reduceMotion) {
+        utils.set(journeyProgress, {
+          strokeDasharray: 620,
+          strokeDashoffset: 620,
+        });
+      }
+      if (!reduceMotion) {
+        utils.set(journeyItems, { opacity: 0.42, scale: 0.92, x: "1rem" });
+        utils.set(profileBars, { scaleX: 0.18, transformOrigin: "0% 50%" });
+        utils.set(network, { opacity: 0.3 });
+        utils.set(networkNodes, { opacity: 0, scale: 0.78 });
+        utils.set(offerCard, { rotate: -4, y: "2rem" });
+        utils.set(offerTags, { opacity: 0, y: "0.8rem" });
+        utils.set(proofCards, { opacity: 0.42, scale: 0.96, y: "2rem" });
+      }
+
+      setActiveScene(0);
+
+      const observer = onScroll({
+        enter: "top top",
+        leave: "bottom bottom",
+        onUpdate: (scrollObserver) => setActiveScene(scrollObserver.progress),
+        sync: true,
+        target: story,
+      });
+      const timeline = createTimeline({ autoplay: observer });
+
+      const addTransition = (
+        fromIndex: number,
+        toIndex: number,
+        start: number,
+        duration: number,
+      ) => {
+        const fromScene = scenes[fromIndex];
+        const toScene = scenes[toIndex];
+        const fromDirection = sceneDirections[fromIndex];
+
+        timeline
+          .add(fromScene, { duration, ease: "linear", opacity: 0 }, start)
+          .add(toScene, {
+            clipPath: "inset(0% 0% 0% 0%)",
+            duration,
+            ease: "linear",
+            opacity: 1,
+          }, start);
+
+        if (reduceMotion) return;
+
+        timeline
+          .add(headingLines[fromIndex], {
+            duration,
+            ease: "inOut(3)",
+            opacity: 0,
+            x: `${fromDirection * 105}vw`,
+          }, start)
+          .add(copyBlocks[fromIndex], {
+            duration,
+            ease: "inOut(3)",
+            opacity: 0,
+            x: `${fromDirection * 105}vw`,
+          }, start)
+          .add(headingLines[toIndex], {
+            duration,
+            ease: "inOut(3)",
+            opacity: 1,
+            x: "0vw",
+          }, start)
+          .add(copyBlocks[toIndex], {
+            duration,
+            ease: "inOut(3)",
+            opacity: 1,
+            x: "0vw",
+          }, start);
+
+        if (artLayers[fromIndex]) {
+          timeline.add(artLayers[fromIndex]!, {
+            duration,
+            ease: "inOut(3)",
+            opacity: 0,
+            scale: 0.94,
+            x: `${fromDirection * -7}vw`,
+          }, start);
+        }
+        if (artLayers[toIndex]) {
+          timeline.add(artLayers[toIndex]!, {
+            duration,
+            ease: "inOut(3)",
+            opacity: 1,
+            scale: 1,
+            x: "0vw",
+          }, start);
+        }
+        if (mediaImages[fromIndex]) {
+          timeline.add(mediaImages[fromIndex]!, {
+            duration,
+            ease: "inOut(3)",
+            scale: 1.08,
+            x: `${fromDirection * -2}vw`,
+          }, start);
+        }
+        if (mediaImages[toIndex]) {
+          timeline.add(mediaImages[toIndex]!, {
+            duration,
+            ease: "inOut(3)",
+            scale: 1,
+            x: "0vw",
+          }, start);
+        }
+      };
+
+      addTransition(0, 1, 120, 80);
+      addTransition(1, 2, 320, 80);
+      addTransition(2, 3, 520, 80);
+      addTransition(3, 4, 720, 80);
+
+      if (!reduceMotion) {
+        if (orbit) {
+          timeline.add(orbit, {
+            duration: 110,
+            ease: "linear",
+            rotate: 28,
+            scale: 1.07,
+          }, 0);
+        }
+        timeline
+          .add(orbitLabels, {
+            duration: 110,
+            ease: "linear",
+            rotate: -28,
+          }, 0)
+          .add(orbitCore, {
+            duration: 110,
+            ease: "linear",
+            rotate: -28,
+            scale: 1.16,
+          }, 0)
+          .add(mediaImages[0]!, {
+            duration: 110,
+            ease: "linear",
+            scale: 1.04,
+            x: "-1vw",
+          }, 0);
+
+        if (journeyProgress) {
+          timeline.add(journeyProgress, {
+            duration: 108,
+            ease: "linear",
+            strokeDashoffset: 0,
+          }, 202);
+        }
+        timeline
+          .add(journeyItems, {
+            delay: stagger(14),
+            duration: 52,
+            ease: "inOut(3)",
+            opacity: 1,
+            scale: 1,
+            x: "0rem",
+          }, 202)
+          .add(profileBars, {
+            delay: stagger(12),
+            duration: 70,
+            ease: "inOut(3)",
+            scaleX: 1,
+          }, 405)
+          .add(network, {
+            duration: 96,
+            ease: "linear",
+            opacity: 1,
+          }, 410)
+          .add(networkNodes, {
+            delay: stagger(14),
+            duration: 46,
+            ease: "inOut(3)",
+            opacity: 1,
+            scale: 1,
+          }, 410)
+          .add(offerCard, {
+            duration: 104,
+            ease: "inOut(3)",
+            rotate: 0,
+            y: "0rem",
+          }, 604)
+          .add(offerTags, {
+            delay: stagger(18),
+            duration: 50,
+            ease: "inOut(3)",
+            opacity: 1,
+            y: "0rem",
+          }, 614)
+          .add(mediaImages[3]!, {
+            duration: 108,
+            ease: "linear",
+            scale: 1.03,
+            x: "-1vw",
+          }, 604)
+          .add(proofCards, {
+            delay: stagger(24),
+            duration: 72,
+            ease: "inOut(3)",
+            opacity: 1,
+            scale: 1,
+            y: "0rem",
+          }, 804);
+      }
+
+      if (handoff) {
+        timeline
+          .add(scenes[4], { duration: 60, ease: "linear", opacity: 0 }, 940)
+          .add(handoff, {
+            duration: 60,
+            ease: "inOut(3)",
+            opacity: 1,
+            y: "0%",
+          }, 940);
+
+        if (!reduceMotion) {
+          timeline
+            .add(headingLines[4], {
+              duration: 60,
+              ease: "inOut(3)",
+              opacity: 0,
+              x: "-105vw",
+            }, 940)
+            .add(copyBlocks[4], {
+              duration: 60,
+              ease: "inOut(3)",
+              opacity: 0,
+              x: "-105vw",
+            }, 940)
+            .add(artLayers[4]!, {
+              duration: 60,
+              ease: "inOut(3)",
+              opacity: 0,
+              scale: 0.96,
+              x: "-4vw",
+            }, 940);
+        }
+      }
+    });
+
+    let resizeTimer = 0;
+    const handleResize = () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => scope.refresh(), 160);
+    };
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.clearTimeout(resizeTimer);
+      scope.revert();
+    };
+  }, []);
 
   useEffect(() => {
     if (location.hash === "#evaluation") {
@@ -424,94 +774,99 @@ export default function AthletesUsa() {
   }, [location.hash]);
 
   return (
-    <MotionConfig reducedMotion="user">
-      <LazyMotion features={domAnimation}>
-        <div className={styles.page} id="athletes-usa">
-          <header className={styles.nav}>
-            <Link to="/showcases/athletes-usa"><Brand /></Link>
-            <Link className={styles.navCta} to="#evaluation">Evaluá tu perfil</Link>
-          </header>
+    <div className={styles.page} id="athletes-usa" ref={rootRef}>
+      <header className={styles.nav}>
+        <Link to="/showcases/athletes-usa"><Brand /></Link>
+        <Link className={styles.navCta} to="#evaluation">Evaluá tu perfil</Link>
+      </header>
 
-          <main>
-            <Section
+      <main>
+        <div className={styles.storyTrack} ref={storyRef}>
+          <div className={styles.storyStage}>
+            <Scene
               id="dream"
+              side="left"
               theme="dark"
               image={stadiumImage}
               imageAlt="Estadio de fútbol iluminado durante la noche"
-              art={() => <OutcomeOrbit />}
+              art={<OutcomeOrbit />}
             >
-              <p className={styles.eyebrow}>TU FUTURO PUEDE EMPEZAR ACÁ</p>
-              <h1>Estudiá. Competí. Crecé en Estados Unidos.</h1>
-              <p className={styles.lede}>Una carrera universitaria y tu deporte al máximo nivel.</p>
+              <p className={styles.eyebrow} data-copy-block>TU FUTURO PUEDE EMPEZAR ACÁ</p>
+              <h1 data-heading>Estudiá. Competí. Crecé en Estados Unidos.</h1>
+              <p className={styles.lede} data-copy-block>Una carrera universitaria y tu deporte al máximo nivel.</p>
               <ArrowLink to="/showcases/athletes-usa/dream">Ver la experiencia</ArrowLink>
-            </Section>
+            </Scene>
 
-            <Section
+            <Scene
               id="path"
+              side="right"
               theme="light"
               className={styles.pathSection}
-              art={(progress) => <JourneyPath progress={progress} />}
+              art={<JourneyPath />}
             >
-              <p className={styles.eyebrow}>ACOMPAÑAMIENTO COMPLETO</p>
-              <h2>Todo tu camino. Un solo equipo.</h2>
-              <p className={styles.lede}>Cinco etapas conectadas para que siempre sepas cuál es el próximo paso.</p>
+              <p className={styles.eyebrow} data-copy-block>ACOMPAÑAMIENTO COMPLETO</p>
+              <h2 data-heading>Todo tu camino. Un solo equipo.</h2>
+              <p className={styles.lede} data-copy-block>Cinco etapas conectadas para que siempre sepas cuál es el próximo paso.</p>
               <ArrowLink to="/showcases/athletes-usa/path">Conocé el proceso</ArrowLink>
-            </Section>
+            </Scene>
 
-            <Section
+            <Scene
               id="opportunity"
+              side="left"
               theme="navy"
               className={styles.opportunitySection}
-              art={(progress) => <OpportunityNetwork progress={progress} />}
+              art={<OpportunityNetwork />}
             >
-              <p className={styles.eyebrow}>TU OPORTUNIDAD</p>
-              <h2>Convertimos tu potencial en un perfil que abre oportunidades.</h2>
-              <p className={styles.lede}>Tu historia deportiva y académica, lista para llegar a las universidades correctas.</p>
+              <p className={styles.eyebrow} data-copy-block>TU OPORTUNIDAD</p>
+              <h2 data-heading>Convertimos tu potencial en un perfil que abre oportunidades.</h2>
+              <p className={styles.lede} data-copy-block>Tu historia deportiva y académica, lista para llegar a las universidades correctas.</p>
               <ArrowLink to="/showcases/athletes-usa/opportunity">Ver cómo lo hacemos</ArrowLink>
-            </Section>
+            </Scene>
 
-            <Section
+            <Scene
               id="campus"
+              side="right"
               theme="dark"
               image={campusImage}
               imageAlt="Campus universitario y estadio deportivo en Estados Unidos"
-              art={(progress) => <CampusDocuments progress={progress} />}
+              art={<CampusDocuments />}
             >
-              <p className={styles.eyebrow}>DE TALENTO A CAMPUS</p>
-              <h2>Conectamos tu talento con la oportunidad correcta.</h2>
-              <p className={styles.lede}>Beca, admisión y visa coordinadas hasta tu primer día en la universidad.</p>
+              <p className={styles.eyebrow} data-copy-block>DE TALENTO A CAMPUS</p>
+              <h2 data-heading>Conectamos tu talento con la oportunidad correcta.</h2>
+              <p className={styles.lede} data-copy-block>Beca, admisión y visa coordinadas hasta tu primer día en la universidad.</p>
               <ArrowLink to="/showcases/athletes-usa/campus">Conocé el camino</ArrowLink>
-            </Section>
+            </Scene>
 
-            <Section id="support" theme="light" art={(progress) => <SupportProof progress={progress} />}>
-              <p className={styles.eyebrow}>ACOMPAÑAMIENTO 360°</p>
-              <h2>Antes, durante y después.</h2>
-              <p className={styles.lede}>Una red que sigue con vos durante tu carrera universitaria y profesional.</p>
-              <div className={styles.metrics} aria-label="Datos de Athletes USA">
+            <Scene id="support" side="left" theme="light" art={<SupportProof />}>
+              <p className={styles.eyebrow} data-copy-block>ACOMPAÑAMIENTO 360°</p>
+              <h2 data-heading>Antes, durante y después.</h2>
+              <p className={styles.lede} data-copy-block>Una red que sigue con vos durante tu carrera universitaria y profesional.</p>
+              <div className={styles.metrics} data-copy-block aria-label="Datos de Athletes USA">
                 <span><strong>2008</strong>Desde</span>
                 <span><strong>3.000+</strong>Estudiantes-atletas</span>
                 <span><strong>20.000+</strong>Entrenadores</span>
               </div>
               <ArrowLink to="/showcases/athletes-usa/support">Ver el acompañamiento</ArrowLink>
-            </Section>
-
-            <section className={`${styles.section} ${styles.evaluation}`} id="evaluation">
-              <div className={styles.evaluationIntro}>
-                <p className={styles.eyebrow}>TU PRIMER PASO</p>
-                <h2>Ahora descubramos tu camino.</h2>
-                <p className={styles.lede}>Contanos un poco sobre vos y armá una primera fotografía de tu perfil.</p>
-              </div>
-              <EvaluationForm />
-            </section>
-          </main>
-
-          <footer className={styles.footer}>
-            <Brand />
-            <span>Showcase conceptual · Buenos Aires · 2026</span>
-            <Link to="/showcases">Volver a DigitalForge</Link>
-          </footer>
+            </Scene>
+                <div className={styles.handoff} data-handoff aria-hidden="true" />
+          </div>
         </div>
-      </LazyMotion>
-    </MotionConfig>
+
+        <section className={`${styles.section} ${styles.evaluation}`} id="evaluation">
+          <div className={styles.evaluationIntro}>
+            <p className={styles.eyebrow}>TU PRIMER PASO</p>
+            <h2>Ahora descubramos tu camino.</h2>
+            <p className={styles.lede}>Contanos un poco sobre vos y armá una primera fotografía de tu perfil.</p>
+          </div>
+          <EvaluationForm />
+        </section>
+      </main>
+
+      <footer className={styles.footer}>
+        <Brand />
+        <span>Showcase conceptual · Buenos Aires · 2026</span>
+        <Link to="/showcases">Volver a DigitalForge</Link>
+      </footer>
+    </div>
   );
 }
