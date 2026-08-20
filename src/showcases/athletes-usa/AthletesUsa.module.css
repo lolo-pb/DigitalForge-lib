@@ -1014,8 +1014,23 @@
     font-size: clamp(4.25rem, 8vw, 7.2rem);
   }
 
+  .scene h1,
+  .scene h2 {
+    font-size: clamp(3.5rem, 6vw, 5.75rem);
+  }
+
   .opportunitySection h2 {
-    font-size: clamp(4.25rem, 6vw, 6rem);
+    max-width: 15ch;
+    font-size: clamp(3.25rem, 4.5vw, 4.75rem);
+  }
+
+  .evaluationIntro {
+    min-width: 0;
+  }
+
+  .evaluation h2 {
+    max-width: 100%;
+    font-size: clamp(3rem, 4.5vw, 5.25rem);
   }
 
   .lede {
