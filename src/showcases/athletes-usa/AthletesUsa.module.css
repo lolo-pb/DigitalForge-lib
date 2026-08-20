@@ -20,6 +20,7 @@
   position: sticky;
   top: 0;
   height: 100svh;
+  height: 100lvh;
   overflow: hidden;
   isolation: isolate;
 }
@@ -90,13 +91,14 @@
 }
 
 .section {
+  --section-bottom-padding: max(3.25rem, env(safe-area-inset-bottom));
   position: relative;
   isolation: isolate;
   display: flex;
   min-height: 100svh;
   align-items: flex-end;
   overflow: hidden;
-  padding: 7rem 1.15rem max(3.25rem, env(safe-area-inset-bottom));
+  padding: 7rem 1.15rem var(--section-bottom-padding);
 }
 
 .scene {
@@ -106,6 +108,12 @@
   min-height: 0;
   pointer-events: none;
   will-change: clip-path, opacity;
+}
+
+.section.scene {
+  padding-bottom: calc(
+    var(--section-bottom-padding) + max(0px, calc(100lvh - 100svh))
+  );
 }
 
 .scene[data-active="true"] {
@@ -156,10 +164,17 @@
 }
 
 .media,
-.mediaScrim,
-.artLayer {
+.mediaScrim {
   position: absolute;
   inset: 0;
+}
+
+.artLayer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 100svh;
 }
 
 .media {
@@ -986,7 +1001,8 @@
   }
 
   .section {
-    padding: 8rem 2rem 4.5rem;
+    --section-bottom-padding: 4.5rem;
+    padding: 8rem 2rem var(--section-bottom-padding);
   }
 
   .sectionContent {

@@ -756,16 +756,7 @@ export default function AthletesUsa() {
       }
     });
 
-    let resizeTimer = 0;
-    const handleResize = () => {
-      window.clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(() => scope.refresh(), 160);
-    };
-    window.addEventListener("resize", handleResize);
-
     return () => {
-      window.removeEventListener("resize", handleResize);
-      window.clearTimeout(resizeTimer);
       scope.revert();
     };
   }, []);
